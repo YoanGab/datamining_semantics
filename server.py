@@ -3,24 +3,17 @@ from flask import Flask, render_template, request
 from flask_minify import minify
 from rdflib import Graph, Literal
 from rdflib.plugins.sparql import prepareQuery
-from JSONLD import *
-from Queries import *
+from Queries import ALL_STATION
+from get_live_data import get_live_data
+from get_data import get_data
 
 app = Flask(__name__)
 minify(app=app, html=True, js=True, cssless=True)
 
-velib_api = "https://opendata.paris.fr/api/records/1.0/search/?dataset=velib-disponibilite-en-temps-reel&q=&facet=name&facet=is_installed&facet=is_renting&facet=is_returning&facet=nom_arrondissement_communes"
 
-velib_api_context = r'contexts/velib_api_context.json'
 
-velib_api_json = JSONLD(velib_api_context, velib_api)
-
-######################################
-# GENERATE GRAPH
-######################################
-g = Graph()
-g.parse(data=velib_api_json, format="json-ld")
-
+g_live = get_live_data() #Graph
+g = get_data("http://localhost:3030/bicycle",ALL_STATION)
 
 # Parse data to return to the view
 def parse_data(item):
