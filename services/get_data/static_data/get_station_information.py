@@ -25,7 +25,7 @@ def get_station_information(csv_path: str = './data/velib-emplacement-des-statio
         g.add((URIRef(station + row['Identifiant station']), RDF.type, URIRef(f"{schema}/station")))
         g.add(
             (URIRef(station + row['Identifiant station']), URIRef(f"{schema}/id"),
-             Literal(row['Identifiant station'], datatype=XSD.integer))
+             Literal(row['Identifiant station'], datatype=XSD.string))
         )
         g.add(
             (URIRef(station + row['Identifiant station']), URIRef(f"{schema}/name"),

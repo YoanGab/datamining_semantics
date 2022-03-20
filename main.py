@@ -18,11 +18,11 @@ def _convert_static_item_to_dict(item: rdflib.query.ResultRow) -> dict:
     :return: dict containing the data for the station given in parameter
     """
     return {
-        'id': item.id.value,
-        'name': item.name.value if item.name else '',
-        'capacity': item.capacity.value if item.capacity else 0,
-        'latitude': item.latitude.value,
-        'longitude': item.longitude.value
+        'id': item['id']['value'] if item['id'] else '',
+        'name': item['name']['value'] if item['name'] else '',
+        'latitude': float(item['latitude']['value']),
+        'longitude': float(item['longitude']['value']),
+        'capacity': int(item['capacity']['value']) if item['capacity'] else 0,
     }
 
 
@@ -31,10 +31,10 @@ def get_static_data_parsed(query: Query = Query.ALL_STATIC_STATIONS) -> list[dic
     :param query: the query to use
     :return: list of dict containing the data for the stations (static)
     """
-    result: dict = triple_store.fetch_data(query=Query.ALL_STATIC_STATIONS)
+    result: dict = triple_store.fetch_data(query=query)
 
     bulk: list = []
-    for row in result:
+    for row in result['results']['bindings']:
         bulk.append(_convert_static_item_to_dict(row))
     return bulk
 

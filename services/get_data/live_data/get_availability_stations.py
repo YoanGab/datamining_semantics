@@ -28,7 +28,7 @@ def get_availability_stations(
         g.add((URIRef(live_station + record['fields']['stationcode']), RDF.type, URIRef(f"{schema}/station")))
         g.add(
             (URIRef(live_station + record['fields']['stationcode']), URIRef(f"{schema}/id"),
-             Literal(record['fields']['stationcode'], datatype=XSD.integer))
+             Literal(record['fields']['stationcode'], datatype=XSD.string))
         )
         g.add(
             (URIRef(live_station + record['fields']['stationcode']), URIRef(f"{schema}/name"),
