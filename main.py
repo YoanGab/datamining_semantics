@@ -5,6 +5,7 @@ import rdflib
 import os
 
 import services.get_data as get_data
+import services.triple_store as triple_store
 from services.triple_store.queries import Query
 
 load_dotenv()
@@ -32,6 +33,9 @@ def get_static_data_parsed(query: Query = Query.ALL_STATIC_STATIONS) -> list[dic
     """
     data: rdflib.Graph = get_data.get_station_information()
     result: rdflib.query.Result = data.query(query_object=query.value)
+
+    #result: rdflib.Graph = triple_store.get_all_stations()
+
     bulk: list = []
     for row in result:
         bulk.append(_convert_static_item_to_dict(row))

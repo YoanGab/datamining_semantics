@@ -6,7 +6,7 @@ from enum import Enum
 import os
 
 load_dotenv()
-PREFIX: str = f"PREFIX ns1:<{os.getenv('ONTOLOGY_URL')}/>"
+PREFIX: str = f"PREFIX ns1:<{os.getenv('ONTOLOGY_URL','http://www.semanticweb.org/groupe1/ontologies/2022/2')}/>"
 
 
 class Query(Enum):

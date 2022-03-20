@@ -74,7 +74,7 @@
 								</div>
 							{% else %}
 								<div>
-									<img src="{{ url_for('static', filename='images/fuel.png') }}" alt="" />
+									<img src="{{ url_for('static', filename='images/meca.png') }}" alt="" />
 								</div>
 								<div>
 									<p style="color: black">number of electrical bicycles: {{record['nb_electrical_bicycles']}}</p>
@@ -149,13 +149,13 @@
 
 		const electric = L.icon({
 			iconUrl: "{{ url_for('static', filename='images/electric.png') }}",
-			iconSize: [20, 20],
+			iconSize: [27, 20],
 			iconAnchor: [12, 12],
 			popupAnchor: [0, -12]
 		});
-		const fuel = L.icon({
-			iconUrl: "{{ url_for('static', filename='images/fuel.png') }}",
-			iconSize: [20, 20],
+		const meca = L.icon({
+			iconUrl: "{{ url_for('static', filename='images/meca.png') }}",
+			iconSize: [27, 20],
 			iconAnchor: [12, 12],
 			popupAnchor: [0, -12]
 		});
@@ -195,7 +195,10 @@
 
 			/* Markers */
 			var isUsable = {{ record['is_usable'] | int }}
-			var marker = L.marker([{{ record['latitude'] }}, {{ record['longitude'] }}],  { icon: (isUsable? electric : fuel) }).addTo(map).bindPopup(text);
+			var nb_meca = {{ record['nb_mechanical_bicycles']}}
+			var nb_elec = {{ record['nb_electrical_bicycles']}}
+			if(isUsable){
+				var marker = L.marker([{{ record['latitude'] }}, {{ record['longitude'] }}],  { icon: (nb_elec>=nb_meca? electric : meca) }).addTo(map).bindPopup(text);}
 		{% endfor %}
 	</script>
 </html>

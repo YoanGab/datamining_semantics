@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-schema: Namespace = Namespace(os.getenv("ONTOLOGY_URL"))
+schema: Namespace = Namespace(os.getenv("ONTOLOGY_URL",'http://www.semanticweb.org/groupe1/ontologies/2022/2'))
 
 
 def get_station_information(csv_path: str = './data/velib-emplacement-des-stations.csv', sep=';') -> Graph:
