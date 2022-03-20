@@ -63,7 +63,7 @@
 							</div>
 							{% if record['is_usable'] %}
 								<div>
-									<img src=templates/index.html alt="" />
+									<img src="{{ url_for('static', filename='images/electric.png') }}" alt="" />
 								</div>
 								<div>
 									<p>number of electrical bicycles: {{record['nb_electrical_bicycles']}}</p>
