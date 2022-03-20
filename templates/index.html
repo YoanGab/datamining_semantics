@@ -33,15 +33,15 @@
 		></script>
 		<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster-src.js"></script>
 
-		<link rel="stylesheet" href="https://car-station.mcheicki.com/static/style.css" />
-		<link rel="icon" type="image/png" href="https://raw.githubusercontent.com/m-cheicki/WEBSEM_car_station/main/static/logo.png" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+		<link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}" />
 	</head>
 
 	<body>
 		<div class="left-panel">
 			<div class="logo">
 				<a href="/">
-					<img src="https://raw.githubusercontent.com/m-cheicki/WEBSEM_car_station/main/static/logo.png" alt="" />
+					<img src="{{ url_for('static', filename='images/logo.png') }}" alt="" />
 				</a>
 			</div>
 			{% if data|length > 0 %}
@@ -63,7 +63,7 @@
 							</div>
 							{% if record['is_usable'] %}
 								<div>
-									<img src="https://raw.githubusercontent.com/m-cheicki/WEBSEM_car_station/main/static/electric.png" alt="" />
+									<img src=templates/index.html alt="" />
 								</div>
 								<div>
 									<p>number of electrical bicycles: {{record['nb_electrical_bicycles']}}</p>
@@ -74,7 +74,7 @@
 								</div>
 							{% else %}
 								<div>
-									<img src="https://raw.githubusercontent.com/m-cheicki/WEBSEM_car_station/main/static/fuel.png" alt="" />
+									<img src="{{ url_for('static', filename='images/fuel.png') }}" alt="" />
 								</div>
 								<div>
 									<p style="color: black">number of electrical bicycles: {{record['nb_electrical_bicycles']}}</p>
@@ -96,45 +96,23 @@
 		</div>
 		<div class="right-panel">
 			<form action="" method="POST" id="form" name="form">
-				<div class="search-bar">
-					<button type="submit" id="submit">
-						<span class="material-icons">search</span>
-					</button>
-					<label for="search"></label><input
-						type="text"
-						list="zipcodes"
-						name="search"
-						id="search"
-						value=""
-						minlength="5"
-						maxlength="5"
-						placeholder="Enter a zipcode"
-					/>
-					<datalist id="zipcodes">
-						<template id="resultstemplate">
-							{% for zipcode in all_zipcodes %}
-								<option value="{{zipcode}}"></option>
-							{% endfor %}
-						</template>
-					</datalist>
-				</div>
-
+				<button type="submit" id="submit"></button>
 				<div class="filters">
-					<div>Type of car :</div>
+					<div>Type of bicycle :</div>
 					<div onchange="validateFormOnFilterChange()">
 						<input
 							type="checkbox"
-							name="type_of_car"
-							id="thermic"
-							value="thermic"
+							name="type_of_bicycle"
+							id="mechanic"
+							value="mechanic"
 							checked
 						/>
-						<label for="thermic">Thermic</label>
+						<label for="mechanic">Mechanic</label>
 					</div>
 					<div onchange="validateFormOnFilterChange()">
 						<input
 							type="checkbox"
-							name="type_of_car"
+							name="type_of_bicycle"
 							id="electric"
 							value="electric"
 							checked
@@ -152,22 +130,8 @@
 	</body>
 
 	<script>
-		/* Datalist dropdown */
-		let search = document.querySelector('#search');
-		let results = document.querySelector('#zipcodes');
-		let templateContent = document.querySelector('#resultstemplate').content;
 		let submit = document.getElementById('submit');
 		let loading = document.getElementById('loader');
-
-		search.addEventListener('click', function handler(event) {
-		    while (results.children.length) results.removeChild(results.firstChild);
-		    let inputVal = new RegExp(search.value.trim(), 'i');
-		    let set = Array.prototype.reduce.call(templateContent.cloneNode(true).children, function searchFilter(frag, item, i) {
-		        if (inputVal.test(item.textContent) && frag.children.length < 10) frag.appendChild(item);
-		        return frag;
-		    }, document.createDocumentFragment());
-		    results.appendChild(set);
-		});
 
 		/* Validate form when clicking in filters */
 		function validateFormOnFilterChange(){
@@ -184,13 +148,13 @@
 		}
 
 		const electric = L.icon({
-			iconUrl: 'https://car-station.mcheicki.com/public/images/electric.png',
+			iconUrl: "{{ url_for('static', filename='images/electric.png') }}",
 			iconSize: [20, 20],
 			iconAnchor: [12, 12],
 			popupAnchor: [0, -12]
 		});
 		const fuel = L.icon({
-			iconUrl: 'https://car-station.mcheicki.com/public/images/fuel.png',
+			iconUrl: "{{ url_for('static', filename='images/fuel.png') }}",
 			iconSize: [20, 20],
 			iconAnchor: [12, 12],
 			popupAnchor: [0, -12]
@@ -215,7 +179,7 @@
 			});
 
 		{% for record in data %}
-			let text = "<div>"
+			var text = "<div>"
 			text += "<h2>{{record['name']}}</h2>"
 			text += "<p>{{record['commune']}}</p>"
 			text += "<br/>"
@@ -230,8 +194,8 @@
 			text += "</div>"
 
 			/* Markers */
-			let isUsable = {{record['is_usable']|int}}
-			let marker = L.marker([{{ record['latitude'] }}, {{ record['longitude'] }}],  { icon: (isUsable? electric : fuel) }).addTo(map).bindPopup(text);
+			var isUsable = {{ record['is_usable'] | int }}
+			var marker = L.marker([{{ record['latitude'] }}, {{ record['longitude'] }}],  { icon: (isUsable? electric : fuel) }).addTo(map).bindPopup(text);
 		{% endfor %}
 	</script>
 </html>

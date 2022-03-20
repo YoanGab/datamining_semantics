@@ -2,7 +2,7 @@ import os
 
 import rdflib.query
 from dotenv import load_dotenv
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_minify import minify
 from rdflib import Graph
 
@@ -10,7 +10,7 @@ import services.get_data as get_data
 from services.triple_store.queries import Query
 
 load_dotenv()
-app = Flask(__name__)
+app = Flask(__name__, template_folder='./templates', static_folder='./templates/assets/common')
 minify(app=app, html=True, js=True, cssless=True)
 
 
@@ -28,12 +28,13 @@ def _convert_static_item_to_dict(item: rdflib.query.ResultRow) -> dict:
     }
 
 
-def get_static_data_parsed() -> list[dict]:
+def get_static_data_parsed(query: Query = Query.ALL_STATIC_STATIONS) -> list[dict]:
     """ Get the static data from the triple store
+    :param query: the query to use
     :return: list of dict containing the data for the stations (static)
     """
     data: Graph = get_data.get_station_information()
-    result: rdflib.query.Result = data.query(Query.ALL_STATIC_STATIONS.value)
+    result: rdflib.query.Result = data.query(query_object=query.value)
     bulk: list = []
     for row in result:
         bulk.append(_convert_static_item_to_dict(row))
@@ -67,24 +68,27 @@ def _convert_live_item_to_dict(item: rdflib.query.ResultRow) -> dict:
     }
 
 
-def get_live_data_parsed() -> list[dict]:
+def get_live_data_parsed(query: Query = Query.ALL_LIVE_STATIONS) -> list[dict]:
     """ Get the live data from the triple store
+    :param query: the query to use
     :return: list of dict containing the data for the stations (live)
     """
     data: Graph = get_data.get_availability_stations()
-    result: rdflib.query.Result = data.query(Query.ALL_LIVE_STATIONS.value)
+    result: rdflib.query.Result = data.query(query_object=query.value)
     bulk: list = []
     for row in result:
         bulk.append(_convert_live_item_to_dict(row))
     return bulk
 
 
-def get_station_data() -> list:
+def get_station_data(static_query: Query = Query.ALL_STATIC_STATIONS, live_query: Query = Query.ALL_LIVE_STATIONS) -> list:
     """ Get the data from the static and live data
+    :param static_query: the query to use for the static data
+    :param live_query: the query to use for the live data
     :return: list of dict containing the data for the stations (static and live)
     """
-    live_data: list = get_live_data_parsed()
-    static_data: list = get_static_data_parsed()
+    live_data: list = get_live_data_parsed(query=live_query)
+    static_data: list = get_static_data_parsed(query=static_query)
     merged_data: list = []
     for live_item in live_data:
         for static_item in static_data:
@@ -96,7 +100,17 @@ def get_station_data() -> list:
 @app.route('/', methods=['GET', 'POST'])
 def index():
     access_token: str = os.getenv('ACCESS_TOKEN')
-    data: list = get_station_data()
+    if request.method == 'GET':
+        data: list = get_station_data()
+        return render_template('index.html', data=data, access_token=access_token)
+
+    static_query: Query = Query.ALL_STATIC_STATIONS
+    if request.form['type_of_bicycle'] == 'electric':
+        live_query: Query = Query.ALL_ELECTRIC_LIVE_STATIONS_AVAILABLE
+    else:
+        live_query: Query = Query.ALL_MECHANICAL_LIVE_STATIONS_AVAILABLE
+    data: list = get_station_data(static_query=static_query, live_query=live_query)
+
     return render_template('index.html', data=data, access_token=access_token)
 
 

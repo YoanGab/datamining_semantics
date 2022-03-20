@@ -10,7 +10,7 @@
 </head>
 <body style="text-align: center">
     <h1>Sorry! This page does not exist. </h1>
-    <img style="display: inline-block" src="./assets/common/images/404.png" />
+    <img style="display: inline-block" src="{{ url_for('static', filename='images/404.png') }}" />
     <a style="display: block" href="{{ url_for('index') }}">Go back to the main page</a>
 </body>
 </html>
