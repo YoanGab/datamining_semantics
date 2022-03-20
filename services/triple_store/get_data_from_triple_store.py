@@ -9,18 +9,15 @@ load_dotenv()
 TRIPLE_STORE_URL: str = os.getenv("TRIPLE_STORE_URL","http://127.0.0.1:3030")
 
 
-def fetch_data(endpoint: str, query: str) -> dict:
+def fetch_data(query: Query, endpoint: str = f"{TRIPLE_STORE_URL}/bicycle") -> dict:
     """ Fetches data from the triple store.
-    :param endpoint: The endpoint to query.
     :param query: The query to execute.
+    :param endpoint: The endpoint to query. Defaults to the triple store.
     :return: The data returned from the query.
     """
     client: SPARQLWrapper = SPARQLWrapper(endpoint)
-    print(query)
-    print(endpoint )
-    client.setQuery(query)
+    client.setQuery(query.value)
     client.setReturnFormat('json')
-    #client.setReturnFormat('csv')
     return client.queryAndConvert()
 
 
@@ -29,4 +26,4 @@ def get_all_stations() -> dict:
     :return: The data returned from the query.
     """
     url: str = f"{TRIPLE_STORE_URL}/bicycle"
-    return fetch_data(url, Query.ALL_STATIC_STATIONS.value)
+    return fetch_data(query=Query.ALL_STATIC_STATIONS, endpoint=url)

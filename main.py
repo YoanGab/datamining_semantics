@@ -31,10 +31,7 @@ def get_static_data_parsed(query: Query = Query.ALL_STATIC_STATIONS) -> list[dic
     :param query: the query to use
     :return: list of dict containing the data for the stations (static)
     """
-    data: rdflib.Graph = get_data.get_station_information()
-    result: rdflib.query.Result = data.query(query_object=query.value)
-
-    #result: rdflib.Graph = triple_store.get_all_stations()
+    result: dict = triple_store.fetch_data(query=Query.ALL_STATIC_STATIONS)
 
     bulk: list = []
     for row in result:
