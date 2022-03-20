@@ -99,10 +99,10 @@ def get_station_data(static_query: Query = Query.ALL_STATIC_STATIONS, live_query
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    access_token: str = os.getenv('ACCESS_TOKEN')
+    mapbox_access_token: str = os.getenv('MAPBOX_ACCESS_TOKEN')
     if request.method == 'GET':
         data: list = get_station_data()
-        return render_template('index.html', data=data, access_token=access_token)
+        return render_template('index.html', data=data, mapbox_access_token=mapbox_access_token)
 
     static_query: Query = Query.ALL_STATIC_STATIONS
     if request.form['type_of_bicycle'] == 'electric':
@@ -111,7 +111,7 @@ def index():
         live_query: Query = Query.ALL_MECHANICAL_LIVE_STATIONS_AVAILABLE
     data: list = get_station_data(static_query=static_query, live_query=live_query)
 
-    return render_template('index.html', data=data, access_token=access_token)
+    return render_template('index.html', data=data, mapbox_access_token=mapbox_access_token)
 
 
 @app.errorhandler(404)
