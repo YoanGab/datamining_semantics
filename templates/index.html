@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Electric car park</title>
+
+		<link
+			href="https://fonts.googleapis.com/icon?family=Material+Icons"
+			rel="stylesheet"
+		/>
+
+		<link
+			rel="stylesheet"
+			href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+			integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+			crossorigin=""
+		/>
+
+		<link
+			rel="stylesheet"
+			href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
+		/>
+		<script
+			src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+			integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+			crossorigin=""
+		></script>
+		<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster-src.js"></script>
+
+		<link rel="stylesheet" href="https://car-station.mcheicki.com/static/style.css" />
+		<link rel="icon" type="image/png" href="https://raw.githubusercontent.com/m-cheicki/WEBSEM_car_station/main/static/logo.png" />
+	</head>
+
+	<body>
+		<div class="left-panel">
+			<div class="logo">
+				<a href="/">
+					<img src="https://raw.githubusercontent.com/m-cheicki/WEBSEM_car_station/main/static/logo.png" alt="" />
+				</a>
+			</div>
+			{% if data|length > 0 %}
+			<div class="nb-results">
+				<p>{{data|length}} results found</p>
+			</div>
+			{% endif %}
+			<div id="results">
+				<div>
+					{% if data|length > 0 %} {% for record in data %}
+					<div
+						class="card"
+						onclick="mapWithSpecificCoordinates({{record['latitude']}} , {{record['longitude']}})"
+					>
+						<div style="font-weight: bold;">
+							<div>
+								<strong>{{record['name']}}</strong>
+								<p>{{record['commune']}}</p>
+							</div>
+							{% if record['is_usable'] %}
+								<div>
+									<img src="https://raw.githubusercontent.com/m-cheicki/WEBSEM_car_station/main/static/electric.png" alt="" />
+								</div>
+								<div>
+									<p>number of electrical bicycles: {{record['nb_electrical_bicycles']}}</p>
+									<p>number of mechanical bicycles: {{record['nb_mechanical_bicycles']}}</p>
+									<p>number of available bicycles: {{record['nb_electrical_bicycles'] + record['nb_mechanical_bicycles']}}</p>
+									<p>number of available terminals: {{record['nb_available_terminals']}}</p>
+									<p>Last update date: {{record['update_date']}}</p>
+								</div>
+							{% else %}
+								<div>
+									<img src="https://raw.githubusercontent.com/m-cheicki/WEBSEM_car_station/main/static/fuel.png" alt="" />
+								</div>
+								<div>
+									<p style="color: black">number of electrical bicycles: {{record['nb_electrical_bicycles']}}</p>
+									<p style="color: black">number of mechanical bicycles: {{record['nb_mechanical_bicycles']}}</p>
+									<p style="color: black">number of available bicycles: {{record['nb_electrical_bicycles'] + record['nb_mechanical_bicycles']}}</p>
+									<p style="color: black">number of available terminals: {{record['nb_available_terminals']}}</p>
+									<p style="color: black">Last update date: {{record['update_date']}}</p>
+								</div>
+							{% endif %}
+						</div>
+					</div>
+					{% endfor %} {% else %}
+					<div class="no-results">
+						<p>No results found :(</p>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		<div class="right-panel">
+			<form action="" method="POST" id="form" name="form">
+				<div class="search-bar">
+					<button type="submit" id="submit">
+						<span class="material-icons">search</span>
+					</button>
+					<label for="search"></label><input
+						type="text"
+						list="zipcodes"
+						name="search"
+						id="search"
+						value=""
+						minlength="5"
+						maxlength="5"
+						placeholder="Enter a zipcode"
+					/>
+					<datalist id="zipcodes">
+						<template id="resultstemplate">
+							{% for zipcode in all_zipcodes %}
+								<option value="{{zipcode}}"></option>
+							{% endfor %}
+						</template>
+					</datalist>
+				</div>
+
+				<div class="filters">
+					<div>Type of car :</div>
+					<div onchange="validateFormOnFilterChange()">
+						<input
+							type="checkbox"
+							name="type_of_car"
+							id="thermic"
+							value="thermic"
+							checked
+						/>
+						<label for="thermic">Thermic</label>
+					</div>
+					<div onchange="validateFormOnFilterChange()">
+						<input
+							type="checkbox"
+							name="type_of_car"
+							id="electric"
+							value="electric"
+							checked
+						/>
+						<label for="electric">Electric</label>
+					</div>
+				</div>
+			</form>
+			<div id="map"></div>
+
+			<div id="loader" class="loader">
+				<div class="loading"></div>
+			</div>
+		</div>
+	</body>
+
+	<script>
+		/* Datalist dropdown */
+		let search = document.querySelector('#search');
+		let results = document.querySelector('#zipcodes');
+		let templateContent = document.querySelector('#resultstemplate').content;
+		let submit = document.getElementById('submit');
+		let loading = document.getElementById('loader');
+
+		search.addEventListener('click', function handler(event) {
+		    while (results.children.length) results.removeChild(results.firstChild);
+		    let inputVal = new RegExp(search.value.trim(), 'i');
+		    let set = Array.prototype.reduce.call(templateContent.cloneNode(true).children, function searchFilter(frag, item, i) {
+		        if (inputVal.test(item.textContent) && frag.children.length < 10) frag.appendChild(item);
+		        return frag;
+		    }, document.createDocumentFragment());
+		    results.appendChild(set);
+		});
+
+		/* Validate form when clicking in filters */
+		function validateFormOnFilterChange(){
+			submit.click();
+			loading.style.visibility = "visible";
+		}
+
+		/* Map */
+		const map = L.map('map');
+
+		/* Move camera with specific coodinates (results' coordinates) */
+		function mapWithSpecificCoordinates(lat, long){
+			map.panTo(new L.LatLng(lat, long), {animate: true, duration: 2});
+		}
+
+		const electric = L.icon({
+			iconUrl: 'https://car-station.mcheicki.com/public/images/electric.png',
+			iconSize: [20, 20],
+			iconAnchor: [12, 12],
+			popupAnchor: [0, -12]
+		});
+		const fuel = L.icon({
+			iconUrl: 'https://car-station.mcheicki.com/public/images/fuel.png',
+			iconSize: [20, 20],
+			iconAnchor: [12, 12],
+			popupAnchor: [0, -12]
+		});
+
+		const createMap = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+			maxZoom: 18,
+			id: 'mapbox/streets-v11',
+			tileSize: 512,
+			zoomOffset: -1,
+			accessToken: "{{ access_token }}"
+		}).addTo(map);
+
+		/* Center map using user location */
+		map.locate({setView: true, watch: false, maxZoom: 13})
+			.on('locationfound', function(e){
+				mapWithSpecificCoordinates(e.latitude, e.longitude);
+			})
+			.on('locationerror', function(e){
+				map.setView([48.856614, 2.3522219], 11);
+			});
+
+		{% for record in data %}
+			let text = "<div>"
+			text += "<h2>{{record['name']}}</h2>"
+			text += "<p>{{record['commune']}}</p>"
+			text += "<br/>"
+			text += "<p>Number of electrical bicycles: {{record['nb_electrical_bicycles']}}</p>"
+			text += "<p>Number of mechanical bicycles: {{record['nb_mechanical_bicycles']}}</p>"
+			text += "<p>Number of available bicycles: {{record['nb_electrical_bicycles'] + record['nb_mechanical_bicycles']}}"
+			text += "<p>Number of available terminals: {{record['nb_available_terminals']}}</p>"
+			text += "<p>Can return bicycle: {{'Yes' if record['can_return_bicycle'] == True else 'No'}}</p>"
+			text += "<p>Is usable: {{'Yes' if record['is_usable'] == True else 'No' }}</p>"
+			text += "<p>Has payment terminal: {{'Yes' if record['has_payment_terminal'] == True else 'No'}}</p>"
+			text += "<p>Last Update: {{record['update_date']}}</p>"
+			text += "</div>"
+
+			/* Markers */
+			let isUsable = {{record['is_usable']|int}}
+			let marker = L.marker([{{ record['latitude'] }}, {{ record['longitude'] }}],  { icon: (isUsable? electric : fuel) }).addTo(map).bindPopup(text);
+		{% endfor %}
+	</script>
+</html>

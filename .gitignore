@@ -1,0 +1,12 @@
+# Environment files
+.env
+
+# Cache files
+*.pyc
+__pycache__
+
+# MacOS files
+.DS_Store
+
+# IDE files
+.idea
