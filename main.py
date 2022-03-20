@@ -15,6 +15,10 @@ minify(app=app, html=True, js=True, cssless=True)
 
 
 def _convert_static_item_to_dict(item: rdflib.query.ResultRow) -> dict:
+    """ Convert the static data to a dict
+    :param item: the static data
+    :return: dict containing the data for the station given in parameter
+    """
     return {
         'id': item.id.value,
         'name': item.name.value if item.name else '',
@@ -25,6 +29,9 @@ def _convert_static_item_to_dict(item: rdflib.query.ResultRow) -> dict:
 
 
 def get_static_data_parsed() -> list[dict]:
+    """ Get the static data from the triple store
+    :return: list of dict containing the data for the stations (static)
+    """
     data: Graph = get_data.get_station_information()
     result: rdflib.query.Result = data.query(Query.ALL_STATIC_STATIONS.value)
     bulk: list = []
@@ -34,6 +41,10 @@ def get_static_data_parsed() -> list[dict]:
 
 
 def _convert_live_item_to_dict(item: rdflib.query.ResultRow) -> dict:
+    """ Convert the live data to a dict
+    :param item: the live data
+    :return: dict containing the data for the station given in parameter
+    """
     update_date_str: str = item.update_date.value
     from datetime import datetime
     if update_date_str:
@@ -57,6 +68,9 @@ def _convert_live_item_to_dict(item: rdflib.query.ResultRow) -> dict:
 
 
 def get_live_data_parsed() -> list[dict]:
+    """ Get the live data from the triple store
+    :return: list of dict containing the data for the stations (live)
+    """
     data: Graph = get_data.get_availability_stations()
     result: rdflib.query.Result = data.query(Query.ALL_LIVE_STATIONS.value)
     bulk: list = []
@@ -66,6 +80,9 @@ def get_live_data_parsed() -> list[dict]:
 
 
 def get_station_data() -> list:
+    """ Get the data from the static and live data
+    :return: list of dict containing the data for the stations (static and live)
+    """
     live_data: list = get_live_data_parsed()
     static_data: list = get_static_data_parsed()
     merged_data: list = []

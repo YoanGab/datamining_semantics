@@ -8,8 +8,8 @@ PREFIX: str = f"PREFIX ns1:<{os.getenv('ONTOLOGY_URL')}/>"
 
 
 class Query(Enum):
-    """ Enum class for all the queries
-    """
+    """ Enum class for all the queries """
+
     ALL_STATIC_STATIONS: str = f"""
         {PREFIX}
         SELECT ?id ?name ?latitude ?longitude ?capacity

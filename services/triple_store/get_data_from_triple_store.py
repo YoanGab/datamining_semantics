@@ -10,11 +10,10 @@ TRIPLE_STORE_URL: str = os.getenv("TRIPLE_STORE_URL")
 
 
 def fetch_data(endpoint: str, query: str) -> dict:
-    """Returns the result of a SPARQL query.
-
-    Keyword arguments:
-    endpoint - URL of sparql endpoint
-    query    - SPARQL query to be executed
+    """ Fetches data from the triple store.
+    :param endpoint: The endpoint to query.
+    :param query: The query to execute.
+    :return: The data returned from the query.
     """
     client: SPARQLWrapper = SPARQLWrapper(endpoint)
     client.setQuery(query)
@@ -23,5 +22,8 @@ def fetch_data(endpoint: str, query: str) -> dict:
 
 
 def get_all_stations() -> dict:
+    """Returns all stations from the triple store.
+    :return: The data returned from the query.
+    """
     url: str = f"{TRIPLE_STORE_URL}/bicycle"
     return fetch_data(url, Query.ALL_STATIONS.value)

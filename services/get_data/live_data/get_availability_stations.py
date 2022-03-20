@@ -13,6 +13,10 @@ def get_availability_stations(
         url: str = "https://opendata.paris.fr/api/records/1.0/search/?dataset=velib-disponibilite-en-temps-reel&q"
                    "=&facet=name&facet=is_installed&facet=is_renting&facet=is_returning&facet"
                    "=nom_arrondissement_communes&rows=2000") -> Graph:
+    """ Get the availability of the stations
+    :param url: the url of the API
+    :return: the graph with the data
+    """
     response: requests.Response = requests.get(url)
     response_json: dict = response.json()
     records: list = response_json['records']

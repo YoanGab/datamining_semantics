@@ -10,6 +10,11 @@ schema: Namespace = Namespace(os.getenv("ONTOLOGY_URL"))
 
 
 def get_station_information(csv_path: str = './data/velib-emplacement-des-stations.csv', sep=';') -> Graph:
+    """ Get station information from csv file.
+    :param csv_path: path to csv file
+    :param sep: separator of csv file
+    :return: rdflib.Graph object with station information
+    """
     df: pd.DataFrame = pd.read_csv(csv_path, sep=sep)
     df['latitude'] = df['Coordonnées géographiques'].str.split(',').str[0]
     df['longitude'] = df['Coordonnées géographiques'].str.split(',').str[1]
