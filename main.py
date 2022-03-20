@@ -1,17 +1,14 @@
-import os
-
-import rdflib.query
 from dotenv import load_dotenv
 from flask import Flask, render_template, request
-from flask_minify import minify
-from rdflib import Graph
+import rdflib
+
+import os
 
 import services.get_data as get_data
 from services.triple_store.queries import Query
 
 load_dotenv()
 app = Flask(__name__, template_folder='./templates', static_folder='./templates/assets/common')
-minify(app=app, html=True, js=True, cssless=True)
 
 
 def _convert_static_item_to_dict(item: rdflib.query.ResultRow) -> dict:
@@ -33,7 +30,7 @@ def get_static_data_parsed(query: Query = Query.ALL_STATIC_STATIONS) -> list[dic
     :param query: the query to use
     :return: list of dict containing the data for the stations (static)
     """
-    data: Graph = get_data.get_station_information()
+    data: rdflib.Graph = get_data.get_station_information()
     result: rdflib.query.Result = data.query(query_object=query.value)
     bulk: list = []
     for row in result:
@@ -73,7 +70,7 @@ def get_live_data_parsed(query: Query = Query.ALL_LIVE_STATIONS) -> list[dict]:
     :param query: the query to use
     :return: list of dict containing the data for the stations (live)
     """
-    data: Graph = get_data.get_availability_stations()
+    data: rdflib.Graph = get_data.get_availability_stations()
     result: rdflib.query.Result = data.query(query_object=query.value)
     bulk: list = []
     for row in result:
