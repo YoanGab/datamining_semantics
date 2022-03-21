@@ -1,3 +1,7 @@
+<p align="center">
+    <img src='https://github.com/YoanGab/dataming_semantics/blob/master/templates/assets/common/images/logo.png' alt='logo'>
+</p>
+
 # Overview
 
 In this project, you will find a Web application that integrates different point of interest which are geospatial data from mutiple sources, including dynamic data about mechanical and electrical bicycles.
