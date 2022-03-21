@@ -1,7 +1,7 @@
 ![image](https://user-images.githubusercontent.com/91973070/159378588-044d206d-e1b5-4625-9490-99a078c4e693.png)
 
 
-# Overview
+# Web datamining & semantics
 
 In this project, you will find a Web application that integrates different point of interest which are geospatial data from mutiple sources, including dynamic data about mechanical and electrical bicycles.
 
