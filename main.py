@@ -12,17 +12,42 @@ load_dotenv()
 app = Flask(__name__, template_folder='./templates', static_folder='./templates/assets/common')
 
 
+# def _convert_static_item_to_dict(item: rdflib.query.ResultRow) -> dict:
+#     """ Convert the static data to a dict
+#     :param item: the static data
+#     :return: dict containing the data for the station given in parameter
+#     """
+#     return {
+#         'id': item['id']['value'] if item['id'] else '',
+#         'name': item['name']['value'] if item['name'] else '',
+#         'latitude': float(item['latitude']['value']),
+#         'longitude': float(item['longitude']['value']),
+#         'capacity': int(item['capacity']['value']) if item['capacity'] else 0,
+#     }
+#
+#
+# def get_static_data_parsed(query: Query = Query.ALL_STATIC_STATIONS) -> list[dict]:
+#     """ Get the static data from the triple store
+#     :param query: the query to use
+#     :return: list of dict containing the data for the stations (static)
+#     """
+#     result: dict = triple_store.fetch_data(query=query)
+#
+#     bulk: list = []
+#     for row in result['results']['bindings']:
+#         bulk.append(_convert_static_item_to_dict(row))
+#     return bulk
 def _convert_static_item_to_dict(item: rdflib.query.ResultRow) -> dict:
     """ Convert the static data to a dict
     :param item: the static data
     :return: dict containing the data for the station given in parameter
     """
     return {
-        'id': item['id']['value'] if item['id'] else '',
-        'name': item['name']['value'] if item['name'] else '',
-        'latitude': float(item['latitude']['value']),
-        'longitude': float(item['longitude']['value']),
-        'capacity': int(item['capacity']['value']) if item['capacity'] else 0,
+        'id': item.id.value,
+        'name': item.name.value if item.name else '',
+        'capacity': item.capacity.value if item.capacity else 0,
+        'latitude': item.latitude.value,
+        'longitude': item.longitude.value
     }
 
 
@@ -31,13 +56,15 @@ def get_static_data_parsed(query: Query = Query.ALL_STATIC_STATIONS) -> list[dic
     :param query: the query to use
     :return: list of dict containing the data for the stations (static)
     """
-    result: dict = triple_store.fetch_data(query=query)
+    data: rdflib.Graph = get_data.get_station_information()
+    result: rdflib.query.Result = data.query(query_object=query.value)
+
+    #result: rdflib.Graph = triple_store.get_all_stations()
 
     bulk: list = []
-    for row in result['results']['bindings']:
+    for row in result:
         bulk.append(_convert_static_item_to_dict(row))
     return bulk
-
 
 def _convert_live_item_to_dict(item: rdflib.query.ResultRow) -> dict:
     """ Convert the live data to a dict
