@@ -1,6 +1,5 @@
-<p align="center">
-    <img src='https://github.com/YoanGab/dataming_semantics/blob/master/templates/assets/common/images/logo.png' alt='logo'>
-</p>
+![image](https://user-images.githubusercontent.com/91973070/159378588-044d206d-e1b5-4625-9490-99a078c4e693.png)
+
 
 # Overview
 
@@ -44,5 +43,7 @@ You can click on the left panel where there are all the results. It will show yo
 You can also filter by type of bicycle available: either mechanic or electric.
 
 
-
+<p align="center">
+    <img src='https://github.com/YoanGab/dataming_semantics/blob/master/templates/assets/common/images/logo.png' alt='logo'>
+</p>
 
