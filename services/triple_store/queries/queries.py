@@ -76,3 +76,40 @@ class Query(Enum):
             FILTER (?nb_mechanical_bicycles > 0)
         }}
     """
+
+    """
+    SPARQL queries
+    """
+
+    STATIC_STATION_GRAPH_PATTERN: Query = f"""
+        {PREFIX}
+        SELECT ?sta
+        WHERE {{
+            ?sta a ns1:station
+        }}
+    """
+    #Return true if there is a station named "Château - République"
+    STATIC_STATION_ASK: Query = f"""
+        {PREFIX}
+        ASK{{ ?sta ns1:name \"Château - République\" .}}
+    """
+    #Describe the station "Château - République" with each subject, predicate and object for this station
+    STATIC_STATION_DESCRIBE: Query =f"""{PREFIX}
+        DESCRIBE ?sta 
+        WHERE {{
+        ?sta ns1:name "Château - République" .
+        }}
+    """
+    #Create a new table RDF with only name and capacity
+    STATIC_CREATE_RDF_NAME_CAPACITY: Query = f"""{PREFIX}
+    CONSTRUCT {{ ?sta ns1:name ?name . ?sta ns1:capacity ?cap .}}
+    WHERE 
+    {{
+        ?sta ns1:name ?name .
+        ?sta ns1:capacity ?cap
+    }}
+    """
+
+
+
+
