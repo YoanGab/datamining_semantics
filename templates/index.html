@@ -97,6 +97,19 @@
 			</div>
 		</div>
 		<div class="right-panel">
+			<form action="{{ url_for('upload') }}" method="POST" id="upload-form" name="upload-form">
+				<select id="format-select" name="format-select">
+					<option value="xml">xml</option>
+					<option value="n3">n3</option>
+					<option value="turtle">turtle</option>
+					<option value="nt">nt</option>
+					<option value="pretty-xml">pretty-xml</option>
+					<option value="trix">trix</option>
+					<option value="trig">trig</option>
+					<option value="nquads">nquads</option>
+				</select>
+					<button type="submit" id="upload-submit">Download</button>
+			</form>
 			<form action="" method="POST" id="form" name="form">
 				<button type="submit" id="submit"></button>
 				<div class="filters">

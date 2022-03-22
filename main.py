@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 import rdflib
 
 import os
@@ -8,7 +8,7 @@ import services.get_data as get_data
 import services.triple_store as triple_store
 from services.triple_store.queries import Query
 from services.get_data import get_temperature
-
+from services.utils import get_extension_from_format
 
 load_dotenv()
 app = Flask(__name__, template_folder='./templates', static_folder='./templates/assets/common')
@@ -134,13 +134,24 @@ def index():
         return render_template('index.html', data=data, mapbox_access_token=mapbox_access_token)
 
     static_query: Query = Query.ALL_STATIC_STATIONS
-    if request.form['type_of_bicycle'] == 'electric':
+    if request.form.get('type_of_bicycle', 'electric') == 'electric':
         live_query: Query = Query.ALL_ELECTRIC_LIVE_STATIONS_AVAILABLE
     else:
         live_query: Query = Query.ALL_MECHANICAL_LIVE_STATIONS_AVAILABLE
     data: list = get_station_data(static_query=static_query, live_query=live_query)
 
     return render_template('index.html', data=data, mapbox_access_token=mapbox_access_token)
+
+
+@app.route('/upload', methods=['POST'])
+def upload():
+    format: str = request.form.get('format-select', 'turtle')
+    extension: str = get_extension_from_format(format)
+    data: rdflib.Graph = get_data.get_station_information()
+    directory: str = os.getcwd()
+    filename: str = f'stations.{extension}'
+    data.serialize(f"{directory}/{filename}", format=format)
+    return send_from_directory(directory, filename, as_attachment=True)
 
 
 @app.errorhandler(404)
