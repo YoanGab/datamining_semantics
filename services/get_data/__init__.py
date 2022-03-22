@@ -1,2 +1,2 @@
-from .live_data.get_availability_stations import get_availability_stations
+from .live_data import get_availability_stations, get_temperature
 from .static_data.get_station_information import get_station_information
