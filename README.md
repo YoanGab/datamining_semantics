@@ -23,7 +23,7 @@ To install packages, run :
 -   Clone this repo :
     `git clone https://github.com/YoanGab/dataming_semantics.git`
 -   In the shell, go into the repository using `cd PATH_TO_REPO`
--   Install necessery packages by running the following command in the shell
+-   Install necessary packages by running the following command in the shell
     `pip install -r requirements.txt`
 
 

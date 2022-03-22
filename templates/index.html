@@ -66,10 +66,11 @@
 									<img src="{{ url_for('static', filename='images/electric.png') }}" alt="" />
 								</div>
 								<div>
-									<p>number of electrical bicycles: {{record['nb_electrical_bicycles']}}</p>
-									<p>number of mechanical bicycles: {{record['nb_mechanical_bicycles']}}</p>
-									<p>number of available bicycles: {{record['nb_electrical_bicycles'] + record['nb_mechanical_bicycles']}}</p>
-									<p>number of available terminals: {{record['nb_available_terminals']}}</p>
+									<p>Number of electrical bicycles: {{record['nb_electrical_bicycles']}}</p>
+									<p>Number of mechanical bicycles: {{record['nb_mechanical_bicycles']}}</p>
+									<p>Number of available bicycles: {{record['nb_electrical_bicycles'] + record['nb_mechanical_bicycles']}}</p>
+									<p>Number of available terminals: {{record['nb_available_terminals']}}</p>
+									<p>Temperature: {{record['temperature']}}</p>
 									<p>Last update date: {{record['update_date']}}</p>
 								</div>
 							{% else %}
@@ -77,10 +78,11 @@
 									<img src="{{ url_for('static', filename='images/mechanic.png') }}" alt="" />
 								</div>
 								<div>
-									<p style="color: black">number of electrical bicycles: {{record['nb_electrical_bicycles']}}</p>
-									<p style="color: black">number of mechanical bicycles: {{record['nb_mechanical_bicycles']}}</p>
-									<p style="color: black">number of available bicycles: {{record['nb_electrical_bicycles'] + record['nb_mechanical_bicycles']}}</p>
-									<p style="color: black">number of available terminals: {{record['nb_available_terminals']}}</p>
+									<p style="color: black">Number of electrical bicycles: {{record['nb_electrical_bicycles']}}</p>
+									<p style="color: black">Number of mechanical bicycles: {{record['nb_mechanical_bicycles']}}</p>
+									<p style="color: black">Number of available bicycles: {{record['nb_electrical_bicycles'] + record['nb_mechanical_bicycles']}}</p>
+									<p style="color: black">Number of available terminals: {{record['nb_available_terminals']}}</p>
+									<p style="color: black">Temperature: {{record['temperature']}}</p>
 									<p style="color: black">Last update date: {{record['update_date']}}</p>
 								</div>
 							{% endif %}

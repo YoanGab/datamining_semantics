@@ -7,6 +7,8 @@ import os
 import services.get_data as get_data
 import services.triple_store as triple_store
 from services.triple_store.queries import Query
+from services.get_data import get_temperature
+
 
 load_dotenv()
 app = Flask(__name__, template_folder='./templates', static_folder='./templates/assets/common')
@@ -37,6 +39,7 @@ app = Flask(__name__, template_folder='./templates', static_folder='./templates/
 #     for row in result['results']['bindings']:
 #         bulk.append(_convert_static_item_to_dict(row))
 #     return bulk
+
 def _convert_static_item_to_dict(item: rdflib.query.ResultRow) -> dict:
     """ Convert the static data to a dict
     :param item: the static data
@@ -119,6 +122,7 @@ def get_station_data(static_query: Query = Query.ALL_STATIC_STATIONS, live_query
         for static_item in static_data:
             if live_item['id'] == static_item['id']:
                 merged_data.append(dict(live_item, **static_item))
+                merged_data[-1]['temperature'] = get_temperature(latitude=merged_data[-1]['latitude'], longitude=merged_data[-1]['longitude'])
     return merged_data
 
 
