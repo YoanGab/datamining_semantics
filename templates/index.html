@@ -99,20 +99,21 @@
 		
 		<div class="right-panel">
 			<div class="trip">
-				<form action="{{ url_for('search_trip') }}" method="POST" id="search-trip" name="search-trip">
-				<p>Find the best trip possible with your departure and arrival adresses.</p>
+				<form action="{{ url_for('search_trip') }}" method="POST" id="search-trip" style='margin-top: 50px;' name="search-trip">
+				<h2>Find the best trip possible with your departure and arrival adresses.</h2>
 				<label for="departure">Departure:</label>
-				<input type="text" id="departure" name="departure" size="10">
+				<input type="text" id="departure" style="border-radius: 15px;width: 200px;text-align: center;" name="departure" size="10">
 				<br>
 				<label for="arrival">Arrival:</label>
-				<input type="text" id="arrival" name="arrival" size="10">
+				<input type="text" id="arrival" style="border-radius: 15px;width: 200px;text-align: center;" name="arrival" size="10">
 				<br>
 				<button type="submit" id="search-trip-submit">Search trip</button>
 
 				</form>
 			</div>
-			<form action="{{ url_for('upload') }}" method="POST" id="upload-form" name="upload-form">
-				<select id="format-select" name="format-select">
+			<div>
+			<form action="{{ url_for('upload') }}" method="POST" id="upload-form" style='margin-top: 50px;'name="upload-form">
+				<select id="format-select" style="border-radius: 15px;width: 200px;text-align: center;" name="format-select">
 					<option value="xml">xml</option>
 					<option value="n3">n3</option>
 					<option value="turtle">turtle</option>
@@ -122,10 +123,12 @@
 					<option value="trig">trig</option>
 					<option value="nquads">nquads</option>
 				</select>
+				<br>
 					<button type="submit" id="upload-submit">Download</button>
 			</form>
+			</div>
 			<form action="" method="POST" id="form" name="form">
-				<button type="submit" id="submit"></button>
+				<button type="submit" id="submit" style="background: transparent;border: none !important;font-size:0;"></button>
 				<div class="filters">
 					<div>Type of bicycle :</div>
 					<div onchange="validateFormOnFilterChange()">
@@ -189,6 +192,20 @@
 			popupAnchor: [0, -12]
 		});
 
+		const vert = L.icon({
+			iconUrl: "{{ url_for('static', filename='images/vert.png') }}",
+			iconSize: [44, 60],
+			iconAnchor: [12, 12],
+			popupAnchor: [0, -12]
+		});
+
+		const rouge = L.icon({
+			iconUrl: "{{ url_for('static', filename='images/rouge.png') }}",
+			iconSize: [44, 60],
+			iconAnchor: [12, 12],
+			popupAnchor: [0, -12]
+		});
+
 		const createMap = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
 			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
 			maxZoom: 18,
@@ -231,8 +248,8 @@
 		{% endfor %}
 
 		{% if dep and arr %}
-			var marker = L.marker([{{ dep['latitude'] }}, {{ dep['longitude'] }}]).addTo(map).bindPopup(text);
-			var marker = L.marker([{{ arr['latitude'] }}, {{ arr['longitude'] }}]).addTo(map).bindPopup(text);
+			var marker = L.marker([{{ dep['latitude'] }}, {{ dep['longitude'] }}],{ icon: vert }).addTo(map).bindPopup(text);
+			var marker = L.marker([{{ arr['latitude'] }}, {{ arr['longitude'] }}],{ icon: rouge }).addTo(map).bindPopup(text);
 		{% endif %}
 	</script>
 </html>

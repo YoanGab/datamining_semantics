@@ -174,6 +174,7 @@ def search_trip():
     coord_arr = response_arr.json()['features'][0]['geometry']['coordinates'][::-1]
 
     station_data = get_station_data()
+    
     nearest_dep = station_data[0]
     nearest_arr = station_data[0]
     eucl_dep = get_euclidean_distance(coord_dep,[station_data[0]['latitude'],station_data[0]['longitude']])

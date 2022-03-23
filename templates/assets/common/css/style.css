@@ -252,9 +252,15 @@ form {
 }
 
 button {
-	background: none;
+	background-color: rgb(155, 188, 243);
 
-	border: none;
+	border: 4px;
+
+	width: 200px;
+
+	cursor: pointer;
+
+	border-radius: 15px;
 
 	padding: 4px 0 0;
 
