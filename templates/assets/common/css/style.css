@@ -213,6 +213,25 @@ div.right-panel {
 
 /******************************************
 
+				WRAPPER
+
+ ******************************************/
+
+#wrapper {
+    width: 80%;
+    overflow: hidden; /* will contain if #first is longer than #second */
+	height: 20%;
+}
+#first {
+    width: 70%;
+    float:left; /* add this */
+}
+#second {
+    overflow: hidden; /* if you don't want #second to wrap below #first */
+}
+
+/******************************************
+
 				SEARCH FORM
 
  ******************************************/
@@ -326,7 +345,7 @@ input[type="text"]:focus {
  ******************************************/
 
 #map {
-	height: calc(100% - 96px);
+	height: calc(75% - 96px);
 
 	width: 95%;
 
