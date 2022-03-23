@@ -192,15 +192,15 @@
 			popupAnchor: [0, -12]
 		});
 
-		const vert = L.icon({
-			iconUrl: "{{ url_for('static', filename='images/vert.png') }}",
+		const departure = L.icon({
+			iconUrl: "{{ url_for('static', filename='images/departure.png') }}",
 			iconSize: [44, 60],
 			iconAnchor: [12, 12],
 			popupAnchor: [0, -12]
 		});
 
-		const rouge = L.icon({
-			iconUrl: "{{ url_for('static', filename='images/rouge.png') }}",
+		const arrival = L.icon({
+			iconUrl: "{{ url_for('static', filename='images/arrival.png') }}",
 			iconSize: [44, 60],
 			iconAnchor: [12, 12],
 			popupAnchor: [0, -12]
@@ -247,9 +247,9 @@
 				var marker = L.marker([{{ record['latitude'] }}, {{ record['longitude'] }}],  { icon: (nb_elec>=nb_meca? electric : meca) }).addTo(map).bindPopup(text);}
 		{% endfor %}
 
-		{% if dep and arr %}
-			var marker = L.marker([{{ dep['latitude'] }}, {{ dep['longitude'] }}],{ icon: vert }).addTo(map).bindPopup(text);
-			var marker = L.marker([{{ arr['latitude'] }}, {{ arr['longitude'] }}],{ icon: rouge }).addTo(map).bindPopup(text);
+		{% if departure and arrival %}
+			var marker = L.marker([{{ departure['latitude'] }}, {{ departure['longitude'] }}],{ icon: departure }).addTo(map).bindPopup(text);
+			var marker = L.marker([{{ arrival['latitude'] }}, {{ arrival['longitude'] }}],{ icon: arrival }).addTo(map).bindPopup(text);
 		{% endif %}
 	</script>
 </html>

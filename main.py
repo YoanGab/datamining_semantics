@@ -1,19 +1,14 @@
-from turtle import st
-from dotenv import load_dotenv
-from flask import Flask, render_template, request, send_from_directory
-import rdflib
-import requests
-from urllib.parse import quote
-
-
 import os
 
+import rdflib
+from dotenv import load_dotenv
+from flask import Flask, render_template, request, send_from_directory
+
 import services.get_data as get_data
-import services.triple_store as triple_store
-from services.triple_store.queries import Query
 from services.get_data import get_temperature
+from services.triple_store.queries import Query
+from services.utils import find_nearest_station, get_coordinates_from_address
 from services.utils import get_extension_from_format
-from services.utils import get_euclidean_distance
 
 load_dotenv()
 app = Flask(__name__, template_folder='./templates', static_folder='./templates/assets/common')
@@ -67,12 +62,13 @@ def get_static_data_parsed(query: Query = Query.ALL_STATIC_STATIONS) -> list[dic
     data: rdflib.Graph = get_data.get_station_information()
     result: rdflib.query.Result = data.query(query_object=query.value)
 
-    #result: rdflib.Graph = triple_store.get_all_stations()
+    # result: rdflib.Graph = triple_store.get_all_stations()
 
     bulk: list = []
     for row in result:
         bulk.append(_convert_static_item_to_dict(row))
     return bulk
+
 
 def _convert_live_item_to_dict(item: rdflib.query.ResultRow) -> dict:
     """ Convert the live data to a dict
@@ -114,7 +110,8 @@ def get_live_data_parsed(query: Query = Query.ALL_LIVE_STATIONS) -> list[dict]:
     return bulk
 
 
-def get_station_data(static_query: Query = Query.ALL_STATIC_STATIONS, live_query: Query = Query.ALL_LIVE_STATIONS) -> list:
+def get_station_data(static_query: Query = Query.ALL_STATIC_STATIONS,
+                     live_query: Query = Query.ALL_LIVE_STATIONS) -> list:
     """ Get the data from the static and live data
     :param static_query: the query to use for the static data
     :param live_query: the query to use for the live data
@@ -127,7 +124,8 @@ def get_station_data(static_query: Query = Query.ALL_STATIC_STATIONS, live_query
         for static_item in static_data:
             if live_item['id'] == static_item['id']:
                 merged_data.append(dict(live_item, **static_item))
-                merged_data[-1]['temperature'] = get_temperature(latitude=merged_data[-1]['latitude'], longitude=merged_data[-1]['longitude'])
+                merged_data[-1]['temperature'] = get_temperature(latitude=merged_data[-1]['latitude'],
+                                                                 longitude=merged_data[-1]['longitude'])
     return merged_data
 
 
@@ -158,37 +156,26 @@ def upload():
     data.serialize(f"{directory}/{filename}", format=format)
     return send_from_directory(directory, filename, as_attachment=True)
 
+
 @app.route('/search_trip', methods=['POST'])
 def search_trip():
     mapbox_access_token: str = os.getenv('MAPBOX_ACCESS_TOKEN')
-    dep: str = request.form.get('departure')
-    arr: str = request.form.get('arrival')
+    departure: str = request.form.get('departure')
+    arrival: str = request.form.get('arrival')
 
-    url_dep = "https://api-adresse.data.gouv.fr/search/?q=" + quote(dep)
-    url_arr = "https://api-adresse.data.gouv.fr/search/?q=" + quote(arr)
+    departure_coordinates: list = get_coordinates_from_address(departure)
+    arrival_coordinates: list = get_coordinates_from_address(arrival)
 
-    response_dep = requests.get(url_dep)
-    response_arr = requests.get(url_arr)
+    station_data: list = get_station_data()
 
-    coord_dep = response_dep.json()['features'][0]['geometry']['coordinates'][::-1]
-    coord_arr = response_arr.json()['features'][0]['geometry']['coordinates'][::-1]
+    available_departure_stations: list = get_station_data(live_query=Query.ALL_LIVE_STATIONS_AVAILABLE)
+    available_arrival_stations: list = get_station_data(live_query=Query.ALL_LIVE_STATIONS_AVAILABLE_FOR_RETURN)
 
-    station_data = get_station_data()
-    
-    nearest_dep = station_data[0]
-    nearest_arr = station_data[0]
-    eucl_dep = get_euclidean_distance(coord_dep,[station_data[0]['latitude'],station_data[0]['longitude']])
-    eucl_arr = get_euclidean_distance(coord_arr,[station_data[0]['latitude'],station_data[0]['longitude']])
-    for station in station_data:
-        eucl_dep_current = get_euclidean_distance(coord_dep,[station['latitude'],station['longitude']])
-        eucl_arr_current = get_euclidean_distance(coord_arr,[station['latitude'],station['longitude']])
-        if eucl_dep_current < eucl_dep:
-            eucl_dep = eucl_dep_current
-            nearest_dep = station
-        if eucl_arr_current < eucl_arr:
-            eucl_arr = eucl_arr_current
-            nearest_arr = station
-    return render_template("index.html",data=station_data,mapbox_access_token=mapbox_access_token,dep=nearest_dep,arr=nearest_arr)
+    departure_station: dict = find_nearest_station(departure_coordinates, available_departure_stations)
+    arrival_station: dict = find_nearest_station(arrival_coordinates, available_arrival_stations)
+
+    return render_template("index.html", data=station_data, mapbox_access_token=mapbox_access_token,
+                           departure=departure_station, arrival=arrival_station)
 
 
 @app.errorhandler(404)
