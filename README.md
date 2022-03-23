@@ -1,4 +1,4 @@
-![image](https://user-images.githubusercontent.com/91973070/159378588-044d206d-e1b5-4625-9490-99a078c4e693.png)
+![image](https://user-images.githubusercontent.com/91973070/159597889-70b5b1eb-b70a-4c33-8fb1-9c92b58772f7.png)
 
 
 # Web datamining & semantics
