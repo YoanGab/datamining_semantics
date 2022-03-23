@@ -1,6 +1,10 @@
+from turtle import st
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, send_from_directory
 import rdflib
+import requests
+from urllib.parse import quote
+
 
 import os
 
@@ -9,6 +13,7 @@ import services.triple_store as triple_store
 from services.triple_store.queries import Query
 from services.get_data import get_temperature
 from services.utils import get_extension_from_format
+from services.utils import get_euclidean_distance
 
 load_dotenv()
 app = Flask(__name__, template_folder='./templates', static_folder='./templates/assets/common')
@@ -152,6 +157,37 @@ def upload():
     filename: str = f'stations.{extension}'
     data.serialize(f"{directory}/{filename}", format=format)
     return send_from_directory(directory, filename, as_attachment=True)
+
+@app.route('/search_trip', methods=['POST'])
+def search_trip():
+    mapbox_access_token: str = os.getenv('MAPBOX_ACCESS_TOKEN')
+    dep: str = request.form.get('departure')
+    arr: str = request.form.get('arrival')
+
+    url_dep = "https://api-adresse.data.gouv.fr/search/?q=" + quote(dep)
+    url_arr = "https://api-adresse.data.gouv.fr/search/?q=" + quote(arr)
+
+    response_dep = requests.get(url_dep)
+    response_arr = requests.get(url_arr)
+
+    coord_dep = response_dep.json()['features'][0]['geometry']['coordinates'][::-1]
+    coord_arr = response_arr.json()['features'][0]['geometry']['coordinates'][::-1]
+
+    station_data = get_station_data()
+    nearest_dep = station_data[0]
+    nearest_arr = station_data[0]
+    eucl_dep = get_euclidean_distance(coord_dep,[station_data[0]['latitude'],station_data[0]['longitude']])
+    eucl_arr = get_euclidean_distance(coord_arr,[station_data[0]['latitude'],station_data[0]['longitude']])
+    for station in station_data:
+        eucl_dep_current = get_euclidean_distance(coord_dep,[station['latitude'],station['longitude']])
+        eucl_arr_current = get_euclidean_distance(coord_arr,[station['latitude'],station['longitude']])
+        if eucl_dep_current < eucl_dep:
+            eucl_dep = eucl_dep_current
+            nearest_dep = station
+        if eucl_arr_current < eucl_arr:
+            eucl_arr = eucl_arr_current
+            nearest_arr = station
+    return render_template("index.html",data=station_data,mapbox_access_token=mapbox_access_token,dep=nearest_dep,arr=nearest_arr)
 
 
 @app.errorhandler(404)

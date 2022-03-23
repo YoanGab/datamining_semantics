@@ -96,7 +96,21 @@
 				</div>
 			</div>
 		</div>
+		
 		<div class="right-panel">
+			<div class="trip">
+				<form action="{{ url_for('search_trip') }}" method="POST" id="search-trip" name="search-trip">
+				<p>Find the best trip possible with your departure and arrival adresses.</p>
+				<label for="departure">Departure:</label>
+				<input type="text" id="departure" name="departure" size="10">
+				<br>
+				<label for="arrival">Arrival:</label>
+				<input type="text" id="arrival" name="arrival" size="10">
+				<br>
+				<button type="submit" id="search-trip-submit">Search trip</button>
+
+				</form>
+			</div>
 			<form action="{{ url_for('upload') }}" method="POST" id="upload-form" name="upload-form">
 				<select id="format-select" name="format-select">
 					<option value="xml">xml</option>
@@ -215,5 +229,10 @@
 			if(isUsable){
 				var marker = L.marker([{{ record['latitude'] }}, {{ record['longitude'] }}],  { icon: (nb_elec>=nb_meca? electric : meca) }).addTo(map).bindPopup(text);}
 		{% endfor %}
+
+		{% if dep and arr %}
+			var marker = L.marker([{{ dep['latitude'] }}, {{ dep['longitude'] }}]).addTo(map).bindPopup(text);
+			var marker = L.marker([{{ arr['latitude'] }}, {{ arr['longitude'] }}]).addTo(map).bindPopup(text);
+		{% endif %}
 	</script>
 </html>
