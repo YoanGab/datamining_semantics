@@ -164,6 +164,9 @@ def search_trip():
     arrival: str = request.form.get('arrival')
     station_data: list = get_station_data()
 
+    if not departure and not arrival:
+        return render_template('index.html', data=station_data, mapbox_access_token=mapbox_access_token)
+
     if not arrival and departure:
         departure_coordinates: list = get_coordinates_from_address(departure)
         available_departure_stations: list = get_station_data(live_query=Query.ALL_LIVE_STATIONS_AVAILABLE)
@@ -179,7 +182,7 @@ def search_trip():
         return render_template(
             'index.html', data=station_data, mapbox_access_token=mapbox_access_token, arrival=arrival_station
         )
-        
+
     departure_coordinates: list = get_coordinates_from_address(departure)
     arrival_coordinates: list = get_coordinates_from_address(arrival)
 

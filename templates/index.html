@@ -249,9 +249,35 @@
 		{% endfor %}
 
 		{% if departure %}
+			var text = "<div>"
+			text += "<h2>{{departure['name']}}</h2>"
+			text += "<p>{{departure['commune']}}</p>"
+			text += "<br/>"
+			text += "<p>Number of electrical bicycles: {{departure['nb_electrical_bicycles']}}</p>"
+			text += "<p>Number of mechanical bicycles: {{departure['nb_mechanical_bicycles']}}</p>"
+			text += "<p>Number of available bicycles: {{departure['nb_electrical_bicycles'] + departure['nb_mechanical_bicycles']}}"
+			text += "<p>Number of available terminals: {{departure['nb_available_terminals']}}</p>"
+			text += "<p>Can return bicycle: {{'Yes' if departure['can_return_bicycle'] == True else 'No'}}</p>"
+			text += "<p>Is usable: {{'Yes' if departure['is_usable'] == True else 'No' }}</p>"
+			text += "<p>Has payment terminal: {{'Yes' if departure['has_payment_terminal'] == True else 'No'}}</p>"
+			text += "<p>Last Update: {{departure['update_date']}}</p>"
+			text += "</div>"
 			var marker = L.marker([{{ departure['latitude'] }}, {{ departure['longitude'] }}],{ icon: departure }).addTo(map).bindPopup(text);
 		{% endif %}
 		{% if arrival %}
+			var text = "<div>"
+			text += "<h2>{{arrival['name']}}</h2>"
+			text += "<p>{{arrival['commune']}}</p>"
+			text += "<br/>"
+			text += "<p>Number of electrical bicycles: {{arrival['nb_electrical_bicycles']}}</p>"
+			text += "<p>Number of mechanical bicycles: {{arrival['nb_mechanical_bicycles']}}</p>"
+			text += "<p>Number of available bicycles: {{arrival['nb_electrical_bicycles'] + arrival['nb_mechanical_bicycles']}}"
+			text += "<p>Number of available terminals: {{arrival['nb_available_terminals']}}</p>"
+			text += "<p>Can return bicycle: {{'Yes' if arrival['can_return_bicycle'] == True else 'No'}}</p>"
+			text += "<p>Is usable: {{'Yes' if arrival['is_usable'] == True else 'No' }}</p>"
+			text += "<p>Has payment terminal: {{'Yes' if arrival['has_payment_terminal'] == True else 'No'}}</p>"
+			text += "<p>Last Update: {{arrival['update_date']}}</p>"
+			text += "</div>"
 			var marker = L.marker([{{ arrival['latitude'] }}, {{ arrival['longitude'] }}],{ icon: arrival }).addTo(map).bindPopup(text);
 		{% endif %}
 	</script>
