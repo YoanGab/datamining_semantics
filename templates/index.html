@@ -248,8 +248,10 @@
 				var marker = L.marker([{{ record['latitude'] }}, {{ record['longitude'] }}],  { icon: (nb_elec>=nb_meca? electric : meca) }).addTo(map).bindPopup(text);}
 		{% endfor %}
 
-		{% if departure and arrival %}
+		{% if departure %}
 			var marker = L.marker([{{ departure['latitude'] }}, {{ departure['longitude'] }}],{ icon: departure }).addTo(map).bindPopup(text);
+		{% endif %}
+		{% if arrival %}
 			var marker = L.marker([{{ arrival['latitude'] }}, {{ arrival['longitude'] }}],{ icon: arrival }).addTo(map).bindPopup(text);
 		{% endif %}
 	</script>

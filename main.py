@@ -162,11 +162,26 @@ def search_trip():
     mapbox_access_token: str = os.getenv('MAPBOX_ACCESS_TOKEN')
     departure: str = request.form.get('departure')
     arrival: str = request.form.get('arrival')
+    station_data: list = get_station_data()
 
+    if not arrival and departure:
+        departure_coordinates: list = get_coordinates_from_address(departure)
+        available_departure_stations: list = get_station_data(live_query=Query.ALL_LIVE_STATIONS_AVAILABLE)
+        departure_station: dict = find_nearest_station(departure_coordinates, available_departure_stations)
+        return render_template(
+            'index.html', data=station_data, mapbox_access_token=mapbox_access_token, departure=departure_station
+        )
+
+    if not departure and arrival:
+        arrival_coordinates: list = get_coordinates_from_address(arrival)
+        available_arrival_stations: list = get_station_data(live_query=Query.ALL_LIVE_STATIONS_AVAILABLE)
+        arrival_station: dict = find_nearest_station(arrival_coordinates, available_arrival_stations)
+        return render_template(
+            'index.html', data=station_data, mapbox_access_token=mapbox_access_token, arrival=arrival_station
+        )
+        
     departure_coordinates: list = get_coordinates_from_address(departure)
     arrival_coordinates: list = get_coordinates_from_address(arrival)
-
-    station_data: list = get_station_data()
 
     available_departure_stations: list = get_station_data(live_query=Query.ALL_LIVE_STATIONS_AVAILABLE)
     available_arrival_stations: list = get_station_data(live_query=Query.ALL_LIVE_STATIONS_AVAILABLE_FOR_RETURN)
